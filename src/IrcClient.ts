@@ -787,13 +787,8 @@ export class IrcClient extends EventEmitter {
 				if (password) {
 					this.sendMessage(Password, { password });
 				}
-				this.sendMessage(NickChange, { nick: this._desiredNick });
-				this.sendMessage(UserRegistration, {
-					user: this._userName ?? this._desiredNick,
-					mode: '8',
-					unused: '*',
-					realName: this._realName ?? this._desiredNick
-				});
+				this._initializeUser();
+				this.pingCheck();
 			} catch (e: unknown) {
 				this.emit(this.onPasswordError, e);
 				this.quit();
@@ -832,6 +827,16 @@ export class IrcClient extends EventEmitter {
 			if (!manually) {
 				this._logger.warn('No further retries will be made');
 			}
+		});
+	}
+
+	private _initializeUser(): void {
+		this.sendMessage(NickChange, { nick: this._desiredNick });
+		this.sendMessage(UserRegistration, {
+			user: this._userName ?? this._desiredNick,
+			mode: '8',
+			unused: '*',
+			realName: this._realName ?? this._desiredNick
 		});
 	}
 
